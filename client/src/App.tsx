@@ -1,5 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useState } from "react";
+import "./App.css";
 
 function App() {
   const {
@@ -8,6 +9,7 @@ function App() {
     isAuthenticated,
     user,
     getAccessTokenSilently,
+    isLoading,
   } = useAuth0();
 
   const [message, setMessage] = useState("");
@@ -30,33 +32,54 @@ function App() {
     setMessage(data.data.hello);
   };
 
+  if (isLoading) {
+    return <div className="center">Loading...</div>;
+  }
+
   if (!isAuthenticated) {
     return (
-      <button onClick={() => loginWithRedirect()}>
-        Login
-      </button>
+      <div className="container">
+        <div className="card">
+          <h1>GraphQL Auth0 App</h1>
+          <p>Secure authentication with Auth0</p>
+          <button className="primary-btn" onClick={() => loginWithRedirect()}>
+            Login with Auth0
+          </button>
+        </div>
+      </div>
     );
   }
 
   return (
-    <div>
-      <h2>Welcome {user?.name}</h2>
+    <div className="container">
+      <div className="card">
+        <img
+          src={user?.picture}
+          alt="profile"
+          className="avatar"
+        />
+        <h2>Welcome {user?.name}</h2>
+        <p className="email">{user?.email}</p>
 
-      <button onClick={callAPI}>Call Protected API</button>
+        <button className="primary-btn" onClick={callAPI}>
+          Call Protected API
+        </button>
 
-      <p>{message}</p>
+        {message && <div className="response">{message}</div>}
 
-      <button
-        onClick={() =>
-          logout({
-            logoutParams: {
-              returnTo: window.location.origin,
-            },
-          })
-        }
-      >
-        Logout
-      </button>
+        <button
+          className="logout-btn"
+          onClick={() =>
+            logout({
+              logoutParams: {
+                returnTo: window.location.origin,
+              },
+            })
+          }
+        >
+          Logout
+        </button>
+      </div>
     </div>
   );
 }
